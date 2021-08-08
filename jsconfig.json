@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@database": ["utils/database/db.js"],
+      "@data": ["utils/data/data.js"],
+      "@models/*": ["models/*"]
+    },
+    "target": "es6"
+  },
+  "exclude": ["node_modules"]
+}
