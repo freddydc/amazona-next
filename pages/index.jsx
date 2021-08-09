@@ -10,7 +10,7 @@ import {
 } from '@material-ui/core';
 import NextLink from 'next/link';
 import Layout from '../components/Layout/Layout';
-import Product from '@models/product/Product';
+import Product from '@models/Product/Product';
 import db from '@database';
 
 const Home = (props) => {

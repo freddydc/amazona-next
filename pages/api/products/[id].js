@@ -1,16 +1,14 @@
 import nc from 'next-connect';
 import Product from '@models/Product/Product';
 import db from '@database';
-import data from '@data';
 
 const handler = nc();
 
 handler.get(async (req, res) => {
   await db.connect();
-  await Product.deleteMany();
-  await Product.insertMany(data.products);
+  const product = await Product.findById(req.query.id);
   await db.disconnect();
-  res.send({ message: 'Seeded successfully' });
+  res.send(product);
 });
 
 export default handler;

@@ -4,7 +4,8 @@
     "paths": {
       "@database": ["utils/database/db.js"],
       "@data": ["utils/data/data.js"],
-      "@models/*": ["models/*"]
+      "@models/*": ["models/*"],
+      "@utils/store/*": ["utils/store/*"]
     },
     "target": "es6"
   },
