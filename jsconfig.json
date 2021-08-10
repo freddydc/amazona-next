@@ -2,12 +2,15 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@components/*": ["components/*"],
       "@database": ["utils/database/db.js"],
       "@data": ["utils/data/data.js"],
       "@models/*": ["models/*"],
       "@utils/store/*": ["utils/store/*"]
     },
-    "target": "es6"
+    "target": "es6",
+    "moduleResolution": "node"
   },
+  "include": ["**/*.js", "**/*.jsx"],
   "exclude": ["node_modules"]
 }
