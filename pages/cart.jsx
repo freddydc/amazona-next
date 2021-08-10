@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import dynamic from 'next/dynamic';
 import Layout from '@components/Layout/Layout';
 import { StoreContext } from '@utils/store/Store';
 import NextLink from 'next/link';
@@ -117,4 +118,4 @@ const CartScreen = () => {
   );
 };
 
-export default CartScreen;
+export default dynamic(() => Promise.resolve(CartScreen), { ssr: false });
