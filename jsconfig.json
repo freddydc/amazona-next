@@ -6,7 +6,7 @@
       "@database": ["utils/database/db.js"],
       "@data": ["utils/data/data.js"],
       "@models/*": ["models/*"],
-      "@utils/store/*": ["utils/store/*"]
+      "@utils/*": ["utils/*"]
     },
     "target": "es6",
     "moduleResolution": "node"
