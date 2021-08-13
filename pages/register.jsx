@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import NextLink from 'next/link';
 import Layout from '@components/Layout/Layout';
 import useStyles from '@components/Layout/styles/styles';
 import { StoreContext } from '@utils/store/Store';
+import { useRouter } from 'next/router';
+import NextLink from 'next/link';
 import {
   Button,
   Link,
@@ -15,10 +15,11 @@ import {
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-const Login = () => {
+const Register = () => {
   const router = useRouter();
-  const { redirect } = router.query; // login?redirect=/shipping
+  const { redirect } = router.query;
   const { state, dispatch } = useContext(StoreContext);
+  const classes = useStyles();
 
   const { userInfo } = state;
   useEffect(() => {
@@ -27,14 +28,20 @@ const Login = () => {
     }
   }, []);
 
-  const classes = useStyles();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const submitHandler = async (e) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      alert("Passwords don't match");
+      return;
+    }
     try {
-      const { data } = await axios.post('/api/users/login', {
+      const { data } = await axios.post('/api/users/register', {
+        name,
         email,
         password,
       });
@@ -42,46 +49,70 @@ const Login = () => {
       Cookies.set('userInfo', JSON.stringify(data));
       router.push(redirect || '/');
     } catch (err) {
-      alert(err.response.data ? err.response.data.message : err.message);
+      alert(
+        err.response.data && err.response.data.message
+          ? err.response.data.message
+          : err.message
+      );
     }
   };
 
   return (
-    <Layout title="Login">
+    <Layout title="Register">
       <form className={classes.form} onSubmit={submitHandler}>
         <Typography component="h1" variant="h1">
-          Login
+          Register
         </Typography>
         <List>
           <ListItem>
             <TextField
+              variant="outlined"
+              fullWidth
+              id="name"
+              label="Name"
+              inputProps={{ type: 'text' }}
+              onChange={(e) => setName(e.target.value)}
+            ></TextField>
+          </ListItem>
+          <ListItem>
+            <TextField
+              variant="outlined"
+              fullWidth
               id="email"
               label="Email"
-              fullWidth
-              variant="outlined"
               inputProps={{ type: 'email' }}
               onChange={(e) => setEmail(e.target.value)}
             ></TextField>
           </ListItem>
           <ListItem>
             <TextField
+              variant="outlined"
+              fullWidth
               id="password"
               label="Password"
-              fullWidth
-              variant="outlined"
               inputProps={{ type: 'password' }}
               onChange={(e) => setPassword(e.target.value)}
             ></TextField>
           </ListItem>
           <ListItem>
-            <Button variant="contained" color="primary" type="submit" fullWidth>
-              Login
+            <TextField
+              variant="outlined"
+              fullWidth
+              id="confirmPassword"
+              label="Confirm Password"
+              inputProps={{ type: 'password' }}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            ></TextField>
+          </ListItem>
+          <ListItem>
+            <Button type="submit" variant="contained" color="primary" fullWidth>
+              Register
             </Button>
           </ListItem>
           <ListItem>
-            New customer? &nbsp;
-            <NextLink href={`/register?redirect=${redirect || '/'}`} passHref>
-              <Link>Create your account</Link>
+            Already have an account? &nbsp;
+            <NextLink href={`/login?redirect=${redirect || '/'}`} passHref>
+              <Link>Login</Link>
             </NextLink>
           </ListItem>
         </List>
@@ -90,4 +121,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
