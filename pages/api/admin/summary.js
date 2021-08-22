@@ -2,12 +2,12 @@ import nc from 'next-connect';
 import Order from '@models/Order/Order';
 import Product from '@models/Product/Product';
 import User from '@models/User/User';
-import { isAuth } from '@utils/auth/auth';
+import { isAuth, isAdmin } from '@utils/auth/auth';
 import { onError } from '@utils/error/error';
 import db from '@database';
 
 const handler = nc({ onError });
-handler.use(isAuth);
+handler.use(isAuth, isAdmin);
 
 handler.get(async (req, res) => {
   await db.connect();
@@ -32,6 +32,7 @@ handler.get(async (req, res) => {
       },
     },
   ]);
+  await db.disconnect();
   res.send({ ordersCount, productsCount, usersCount, ordersPrice, salesData });
 });
 
