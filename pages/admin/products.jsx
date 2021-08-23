@@ -24,20 +24,20 @@ import { getError } from '@utils/error/error';
 import { StoreContext } from '@utils/store/Store';
 import axios from 'axios';
 
-function orderReducer(state, action) {
+function productReducer(state, action) {
   switch (action.type) {
-    case 'FETCH_ORDERS_REQUEST':
+    case 'FETCH_PRODUCTS_REQUEST':
       return { ...state, loading: true, error: '' };
-    case 'FETCH_ORDERS_SUCCESS':
-      return { ...state, loading: false, orders: action.payload, error: '' };
-    case 'FETCH_ORDERS_FAIL':
+    case 'FETCH_PRODUCTS_SUCCESS':
+      return { ...state, loading: false, products: action.payload, error: '' };
+    case 'FETCH_PRODUCTS_FAIL':
       return { ...state, loading: false, error: action.payload };
     default:
       return state;
   }
 }
 
-const OrderDashboard = () => {
+const ProductDashboard = () => {
   const classes = useStyles();
   const router = useRouter();
   const { state } = useContext(StoreContext);
@@ -45,12 +45,12 @@ const OrderDashboard = () => {
 
   const initialState = {
     loading: true,
-    orders: [],
+    products: [],
     error: '',
   };
 
-  const [{ loading, error, orders }, dispatch] = useReducer(
-    orderReducer,
+  const [{ loading, error, products }, dispatch] = useReducer(
+    productReducer,
     initialState
   );
 
@@ -58,22 +58,22 @@ const OrderDashboard = () => {
     if (!userInfo) {
       router.push('/login');
     }
-    const fetchOrders = async () => {
+    const fetchProducts = async () => {
       try {
-        dispatch({ type: 'FETCH_ORDERS_REQUEST' });
-        const { data } = await axios.get('/api/admin/orders', {
+        dispatch({ type: 'FETCH_PRODUCTS_REQUEST' });
+        const { data } = await axios.get('/api/admin/products', {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
-        dispatch({ type: 'FETCH_ORDERS_SUCCESS', payload: data });
+        dispatch({ type: 'FETCH_PRODUCTS_SUCCESS', payload: data });
       } catch (err) {
-        dispatch({ type: 'FETCH_ORDERS_FAIL', payload: getError(err) });
+        dispatch({ type: 'FETCH_PRODUCTS_FAIL', payload: getError(err) });
       }
     };
-    fetchOrders();
+    fetchProducts();
   }, []);
 
   return (
-    <Layout title="Orders">
+    <Layout title="Products">
       <Grid container spacing={1}>
         <Grid item md={3} xs={12}>
           <Card className={classes.section}>
@@ -84,12 +84,12 @@ const OrderDashboard = () => {
                 </ListItem>
               </NextLink>
               <NextLink href="/admin/orders" passHref>
-                <ListItem selected button component="a">
+                <ListItem button component="a">
                   <ListItemText primary="Orders"></ListItemText>
                 </ListItem>
               </NextLink>
               <NextLink href="/admin/products" passHref>
-                <ListItem button component="a">
+                <ListItem selected button component="a">
                   <ListItemText primary="Products"></ListItemText>
                 </ListItem>
               </NextLink>
@@ -101,7 +101,7 @@ const OrderDashboard = () => {
             <List>
               <ListItem>
                 <Typography component="h1" variant="h1">
-                  Orders
+                  Products
                 </Typography>
               </ListItem>
               <ListItem>
@@ -115,42 +115,37 @@ const OrderDashboard = () => {
                       <TableHead>
                         <TableRow>
                           <TableCell>Id</TableCell>
-                          <TableCell>User</TableCell>
-                          <TableCell>Date</TableCell>
-                          <TableCell>Total</TableCell>
-                          <TableCell>Paid</TableCell>
-                          <TableCell>Delivered</TableCell>
-                          <TableCell>Action</TableCell>
+                          <TableCell>Name</TableCell>
+                          <TableCell>Price</TableCell>
+                          <TableCell>Category</TableCell>
+                          <TableCell>Count</TableCell>
+                          <TableCell>Rating</TableCell>
+                          <TableCell>Actions</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {orders.map((order) => (
-                          <TableRow key={order._id}>
-                            <TableCell>{order._id.substring(18, 24)}</TableCell>
+                        {products.map((product) => (
+                          <TableRow key={product._id}>
                             <TableCell>
-                              {order.user ? order.user.name : 'Deleted User'}
+                              {product._id.substring(18, 24)}
                             </TableCell>
+                            <TableCell>{product.name}</TableCell>
+                            <TableCell>{product.price}</TableCell>
+                            <TableCell>{product.category}</TableCell>
+                            <TableCell>{product.countInStock}</TableCell>
+                            <TableCell>{product.rating}</TableCell>
                             <TableCell>
-                              {order.createdAt.substring(0, 10)}
-                            </TableCell>
-                            <TableCell>${order.totalPrice}</TableCell>
-                            <TableCell>
-                              {order.isPaid
-                                ? `paid at ${order.paidAt.substring(0, 10)}`
-                                : 'not paid'}
-                            </TableCell>
-                            <TableCell>
-                              {order.isDelivered
-                                ? `delivered at ${order.deliveredAt.substring(
-                                    0,
-                                    10
-                                  )}`
-                                : 'not delivered'}
-                            </TableCell>
-                            <TableCell>
-                              <NextLink href={`/order/${order._id}`} passHref>
-                                <Button variant="contained">Details</Button>
-                              </NextLink>
+                              <NextLink
+                                href={`/admin/product/${product._id}`}
+                                passHref
+                              >
+                                <Button size="small" variant="contained">
+                                  Edit
+                                </Button>
+                              </NextLink>{' '}
+                              <Button size="small" variant="contained">
+                                Delete
+                              </Button>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -167,4 +162,4 @@ const OrderDashboard = () => {
   );
 };
 
-export default dynamic(() => Promise.resolve(OrderDashboard), { ssr: false });
+export default dynamic(() => Promise.resolve(ProductDashboard), { ssr: false });
