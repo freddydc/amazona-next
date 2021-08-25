@@ -25,20 +25,14 @@ import { StoreContext } from '@utils/store/Store';
 import { useSnackbar } from 'notistack';
 import axios from 'axios';
 
-function productReducer(state, action) {
+function userReducer(state, action) {
   switch (action.type) {
-    case 'FETCH_PRODUCTS_REQUEST':
+    case 'FETCH_USERS_REQUEST':
       return { ...state, loading: true, error: '' };
-    case 'FETCH_PRODUCTS_SUCCESS':
-      return { ...state, loading: false, products: action.payload, error: '' };
-    case 'FETCH_PRODUCTS_FAIL':
+    case 'FETCH_USERS_SUCCESS':
+      return { ...state, loading: false, users: action.payload, error: '' };
+    case 'FETCH_USERS_FAIL':
       return { ...state, loading: false, error: action.payload };
-    case 'CREATE_REQUEST':
-      return { ...state, loadingCreate: true };
-    case 'CREATE_SUCCESS':
-      return { ...state, loadingCreate: false };
-    case 'CREATE_FAIL':
-      return { ...state, loadingCreate: false };
     case 'DELETE_REQUEST':
       return { ...state, loadingDelete: true };
     case 'DELETE_SUCCESS':
@@ -52,7 +46,7 @@ function productReducer(state, action) {
   }
 }
 
-const ProductDashboard = () => {
+const AdminUsers = () => {
   const classes = useStyles();
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
@@ -61,70 +55,46 @@ const ProductDashboard = () => {
 
   const initialState = {
     loading: true,
-    products: [],
+    users: [],
     error: '',
   };
 
-  const [
-    { loading, error, products, loadingCreate, successDelete, loadingDelete },
-    dispatch,
-  ] = useReducer(productReducer, initialState);
+  const [{ loading, error, users, successDelete, loadingDelete }, dispatch] =
+    useReducer(userReducer, initialState);
 
   useEffect(() => {
     if (!userInfo) {
       router.push('/login');
     }
-    const fetchProducts = async () => {
+    const fetchUsers = async () => {
       try {
-        dispatch({ type: 'FETCH_PRODUCTS_REQUEST' });
-        const { data } = await axios.get('/api/admin/products', {
+        dispatch({ type: 'FETCH_USERS_REQUEST' });
+        const { data } = await axios.get('/api/admin/users', {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
-        dispatch({ type: 'FETCH_PRODUCTS_SUCCESS', payload: data });
+        dispatch({ type: 'FETCH_USERS_SUCCESS', payload: data });
       } catch (err) {
-        dispatch({ type: 'FETCH_PRODUCTS_FAIL', payload: getError(err) });
+        dispatch({ type: 'FETCH_USERS_FAIL', payload: getError(err) });
       }
     };
     if (successDelete) {
       dispatch({ type: 'DELETE_RESET' });
     } else {
-      fetchProducts();
+      fetchUsers();
     }
   }, [successDelete]);
 
-  const createHandler = async () => {
-    if (!window.confirm('Are you sure?')) {
-      return;
-    }
-    try {
-      dispatch({ type: 'CREATE_REQUEST' });
-      const { data } = await axios.post(
-        '/api/admin/products',
-        {},
-        {
-          headers: { authorization: `Bearer ${userInfo.token}` },
-        }
-      );
-      dispatch({ type: 'CREATE_SUCCESS' });
-      enqueueSnackbar('Product created successfully', { variant: 'success' });
-      router.push(`/admin/product/${data.product._id}`);
-    } catch (err) {
-      dispatch({ type: 'CREATE_FAIL' });
-      enqueueSnackbar(getError(err), { variant: 'error' });
-    }
-  };
-
-  const deleteHandler = async (productId) => {
+  const deleteHandler = async (userId) => {
     if (!window.confirm('Are you sure?')) {
       return;
     }
     try {
       dispatch({ type: 'DELETE_REQUEST' });
-      await axios.delete(`/api/admin/products/${productId}`, {
+      await axios.delete(`/api/admin/users/${userId}`, {
         headers: { authorization: `Bearer ${userInfo.token}` },
       });
       dispatch({ type: 'DELETE_SUCCESS' });
-      enqueueSnackbar('Product deleted successfully', { variant: 'success' });
+      enqueueSnackbar('User deleted successfully', { variant: 'success' });
     } catch (err) {
       dispatch({ type: 'DELETE_FAIL' });
       enqueueSnackbar(getError(err), { variant: 'error' });
@@ -132,7 +102,7 @@ const ProductDashboard = () => {
   };
 
   return (
-    <Layout title="Products">
+    <Layout title="Users">
       <Grid container spacing={1}>
         <Grid item md={3} xs={12}>
           <Card className={classes.section}>
@@ -148,12 +118,12 @@ const ProductDashboard = () => {
                 </ListItem>
               </NextLink>
               <NextLink href="/admin/products" passHref>
-                <ListItem selected button component="a">
+                <ListItem button component="a">
                   <ListItemText primary="Products" />
                 </ListItem>
               </NextLink>
               <NextLink href="/admin/users" passHref>
-                <ListItem button component="a">
+                <ListItem selected button component="a">
                   <ListItemText primary="Users" />
                 </ListItem>
               </NextLink>
@@ -164,24 +134,10 @@ const ProductDashboard = () => {
           <Card className={classes.section}>
             <List>
               <ListItem>
-                <Grid container alignItems="center">
-                  <Grid item xs={6}>
-                    <Typography component="h1" variant="h1">
-                      Products
-                    </Typography>
-                    {loadingDelete && <CircularProgress />}
-                  </Grid>
-                  <Grid align="right" item xs={6}>
-                    <Button
-                      onClick={createHandler}
-                      variant="contained"
-                      color="primary"
-                    >
-                      Create
-                    </Button>
-                    {loadingCreate && <CircularProgress />}
-                  </Grid>
-                </Grid>
+                <Typography component="h1" variant="h1">
+                  Users
+                </Typography>
+                {loadingDelete && <CircularProgress />}
               </ListItem>
               <ListItem>
                 {loading ? (
@@ -193,29 +149,23 @@ const ProductDashboard = () => {
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>Id</TableCell>
-                          <TableCell>Name</TableCell>
-                          <TableCell>Price</TableCell>
-                          <TableCell>Category</TableCell>
-                          <TableCell>Count</TableCell>
-                          <TableCell>Rating</TableCell>
-                          <TableCell>Actions</TableCell>
+                          <TableCell>ID</TableCell>
+                          <TableCell>NAME</TableCell>
+                          <TableCell>EMAIL</TableCell>
+                          <TableCell>ADMIN</TableCell>
+                          <TableCell>ACTIONS</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {products.map((product) => (
-                          <TableRow key={product._id}>
-                            <TableCell>
-                              {product._id.substring(18, 24)}
-                            </TableCell>
-                            <TableCell>{product.name}</TableCell>
-                            <TableCell>{product.price}</TableCell>
-                            <TableCell>{product.category}</TableCell>
-                            <TableCell>{product.countInStock}</TableCell>
-                            <TableCell>{product.rating}</TableCell>
+                        {users.map((user) => (
+                          <TableRow key={user._id}>
+                            <TableCell>{user._id.substring(18, 24)}</TableCell>
+                            <TableCell>{user.name}</TableCell>
+                            <TableCell>{user.email}</TableCell>
+                            <TableCell>{user.isAdmin ? 'Yes' : 'No'}</TableCell>
                             <TableCell>
                               <NextLink
-                                href={`/admin/product/${product._id}`}
+                                href={`/admin/user/${user._id}`}
                                 passHref
                               >
                                 <Button size="small" variant="contained">
@@ -223,9 +173,9 @@ const ProductDashboard = () => {
                                 </Button>
                               </NextLink>{' '}
                               <Button
-                                size="small"
+                                onClick={() => deleteHandler(user._id)}
                                 variant="contained"
-                                onClick={() => deleteHandler(product._id)}
+                                size="small"
                               >
                                 Delete
                               </Button>
@@ -245,4 +195,4 @@ const ProductDashboard = () => {
   );
 };
 
-export default dynamic(() => Promise.resolve(ProductDashboard), { ssr: false });
+export default dynamic(() => Promise.resolve(AdminUsers), { ssr: false });
