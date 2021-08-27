@@ -23,9 +23,11 @@ import {
   Menu,
   MenuItem,
   IconButton,
+  InputBase,
 } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import CancelIcon from '@material-ui/icons/Cancel';
+import SearchIcon from '@material-ui/icons/Search';
 import useStyles from './styles/styles';
 import { StoreContext } from '../../utils/store/Store';
 import { useSnackbar } from 'notistack';
@@ -43,6 +45,7 @@ const Layout = ({ title, description, children }) => {
 
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [query, setQuery] = useState('');
 
   const sidebarOpenHandler = () => {
     setSidebarVisible(true);
@@ -63,6 +66,14 @@ const Layout = ({ title, description, children }) => {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  const queryChangeHandler = (e) => {
+    setQuery(e.target.value);
+  };
+  const submitHandler = (e) => {
+    e.preventDefault();
+    router.push(`/search?query=${query}`);
+  };
 
   const theme = createTheme({
     typography: {
@@ -127,6 +138,7 @@ const Layout = ({ title, description, children }) => {
                 edge="start"
                 aria-label="open drawer"
                 onClick={sidebarOpenHandler}
+                className={classes.menuButton}
               >
                 <MenuIcon className={classes.navbarButton} />
               </IconButton>
@@ -175,7 +187,23 @@ const Layout = ({ title, description, children }) => {
                 ))}
               </List>
             </Drawer>
-            <div className={classes.grow}></div>
+            <div className={classes.searchSection}>
+              <form className={classes.searchForm} onSubmit={submitHandler}>
+                <InputBase
+                  name="query"
+                  onChange={queryChangeHandler}
+                  placeholder="Search products"
+                  className={classes.searchInput}
+                />
+                <IconButton
+                  type="submit"
+                  className={classes.iconButton}
+                  aria-label="search"
+                >
+                  <SearchIcon />
+                </IconButton>
+              </form>
+            </div>
             <div>
               <Switch
                 checked={darkMode}
