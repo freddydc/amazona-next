@@ -56,6 +56,9 @@ const useStyles = makeStyles((theme) => ({
   menuButton: {
     padding: 0,
   },
+  mt_1: {
+    marginTop: '1rem',
+  },
   searchSection: {
     display: 'none',
     [theme.breakpoints.up('md')]: {
@@ -81,6 +84,9 @@ const useStyles = makeStyles((theme) => ({
     '& span': {
       color: '#111',
     },
+  },
+  sort: {
+    marginRight: 5,
   },
 }));
 
