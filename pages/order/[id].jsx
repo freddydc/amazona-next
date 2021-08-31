@@ -216,7 +216,16 @@ const Order = ({ params }) => {
                 <ListItem>
                   {shippingAddress.fullName}, {shippingAddress.address},{' '}
                   {shippingAddress.city}, {shippingAddress.postalCode},{' '}
-                  {shippingAddress.country}.
+                  {shippingAddress.country}. &nbsp;
+                  {shippingAddress.location && (
+                    <Link
+                      href={`https://maps.google.com?q=${shippingAddress.location.lat},${shippingAddress.location.lng}`}
+                      variant="button"
+                      target="_new"
+                    >
+                      Show On Map
+                    </Link>
+                  )}
                 </ListItem>
                 <ListItem>
                   Status:{' '}

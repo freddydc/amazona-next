@@ -24,12 +24,14 @@ const Shipping = () => {
     control,
     formState: { errors },
     setValue,
+    getValues,
   } = useForm();
 
   const {
     userInfo,
     cart: { shippingAddress },
   } = state;
+  const { location } = shippingAddress;
 
   useEffect(() => {
     if (!userInfo) {
@@ -45,6 +47,31 @@ const Shipping = () => {
   const submitHandler = ({ fullName, address, city, postalCode, country }) => {
     dispatch({
       type: 'SAVE_SHIPPING_ADDRESS',
+      payload: { fullName, address, city, postalCode, country, location },
+    });
+    Cookies.set(
+      'shippingAddress',
+      JSON.stringify({
+        fullName,
+        address,
+        city,
+        postalCode,
+        country,
+        location,
+      })
+    );
+    router.push('/payment');
+  };
+
+  const chooseLocationHandler = () => {
+    const fullName = getValues('fullName');
+    const address = getValues('address');
+    const city = getValues('city');
+    const postalCode = getValues('postalCode');
+    const country = getValues('country');
+
+    dispatch({
+      type: 'SAVE_SHIPPING_ADDRESS',
       payload: { fullName, address, city, postalCode, country },
     });
     Cookies.set(
@@ -55,9 +82,10 @@ const Shipping = () => {
         city,
         postalCode,
         country,
+        location,
       })
     );
-    router.push('/payment');
+    router.push('/map');
   };
 
   return (
@@ -192,6 +220,20 @@ const Shipping = () => {
                 ></TextField>
               )}
             ></Controller>
+          </ListItem>
+          <ListItem>
+            <Button
+              variant="contained"
+              type="button"
+              onClick={chooseLocationHandler}
+            >
+              Choose On Map
+            </Button>
+            <Typography>
+              {location.lat &&
+                location.lng &&
+                `${location.lat}, ${location.lng}`}
+            </Typography>
           </ListItem>
           <ListItem>
             <Button variant="contained" color="primary" type="submit" fullWidth>
